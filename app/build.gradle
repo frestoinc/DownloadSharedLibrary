@@ -1,0 +1,135 @@
+apply plugin: 'com.android.application'
+apply plugin: 'org.owasp.dependencycheck'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+    defaultConfig {
+        applicationId "com.example.downloadsharedlibrary"
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk.abiFilters 'arm64-v8a'
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.10.2"
+        }
+    }
+
+    sourceSets {
+        main {
+            jni.srcDirs = ['src/main/cpp']
+            jniLibs.srcDirs = ['src/main/cpp']
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning', 'InvalidPackage'
+        abortOnError true
+        absolutePaths true
+        enable 'RtlHardcoded', 'RtlCompat', 'RtlEnabled'
+        enable 'RtlHardcoded', 'RtlCompat', 'RtlEnabled'
+        checkReleaseBuilds true
+        fatal 'NewApi'
+        error 'Wakelock', 'TextViewEdits'
+        warning 'ResourceAsColor'
+        checkDependencies true
+    }
+}
+
+apply plugin: 'com.github.spotbugs'
+spotbugs {
+    toolVersion = '3.1.10'
+    ignoreFailures = false
+    effort = "max"
+    reportLevel = "high"
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    dependsOn 'assembleDebug'
+    group = "verification"
+
+    classes = fileTree("build/intermediates/javac/debug/")
+    ignoreFailures = false
+    classpath = files()
+    // configure automatically generated tasks
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html.destination = file("$project.buildDir/outputs/spotbugs/spotbugs.html")
+    }
+}
+
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion = '8.24'
+}
+
+task checkstyle(type: Checkstyle) {
+    // rules.xml copy from:
+    // https://raw.githubusercontent.com/checkstyle/checkstyle/checkstyle-7.4/src/main/resources/google_checks.xml
+    // the version should be as same as plugin version
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    exclude '**/R.java'
+    exclude '**/BuildConfig.java'
+    classpath = files()
+}
+
+apply plugin: 'pmd'
+
+task pmd(type: Pmd) {
+    ruleSetFiles = files("${project.rootDir}/config/pmd/rulespmd.xml")
+    ignoreFailures = false
+    ruleSets = []
+
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    exclude '**/model/**'
+
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html {
+            destination file("$project.buildDir/outputs/pmd/pmd.html")
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'org.bytedeco:javacpp:1.5.1'
+}
