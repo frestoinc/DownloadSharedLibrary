@@ -231,17 +231,6 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 
 
 #include <openssl/crypto.h>
-
-# define OPENSSL_VERSION                0
-# define OPENSSL_CFLAGS                 1
-# define OPENSSL_BUILT_ON               2
-# define OPENSSL_PLATFORM               3
-# define OPENSSL_DIR                    4
-# define OPENSSL_ENGINES_DIR            5
-# define OPENSSL_VERSION_STRING         6
-# define OPENSSL_FULL_VERSION_STRING    7
-# define OPENSSL_MODULES_DIR            8
-# define OPENSSL_CPU_INFO               9
  
 
 #ifdef __cplusplus
@@ -258,7 +247,6 @@ SWIGEXPORT jlong JNICALL Java_com_example_downloadsharedlibrary_cryptoJNI_OpenSS
   jresult = (jlong)result; 
   return jresult;
 }
-
 
 SWIGEXPORT jstring JNICALL Java_com_example_downloadsharedlibrary_cryptoJNI_OpenSSL_1version(JNIEnv *jenv, jclass jcls, jint jarg1) {
   jstring jresult = 0 ;

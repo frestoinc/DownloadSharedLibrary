@@ -11,14 +11,14 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 set(openssl_DIR ${CMAKE_SOURCE_DIR}/openssl)
 include_directories(${openssl_DIR}/${ANDROID_ABI}/include)
-add_library(crypto1 SHARED IMPORTED)
-set_target_properties(crypto1 PROPERTIES IMPORTED_LOCATION
+add_library(crypto SHARED IMPORTED)
+set_target_properties(crypto PROPERTIES IMPORTED_LOCATION
         ${openssl_DIR}/${ANDROID_ABI}/libcrypto1.so)
 
 add_library(mytest
         SHARED
         crypto.cpp)
-target_link_libraries(mytest crypto1)
+target_link_libraries(mytest crypto)
 
 
 # Specifies libraries CMake should link to your target library. You
